@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
+import { BuscadorComponent } from './components/buscador/buscador.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  imports: [BuscadorComponent], // <-- Importamos tu componente aquí
+  template: `<app-buscador></app-buscador>` // <-- Renderizamos directamente el buscador
 })
-export class AppComponent {
-  title = 'secop-dashboard';
-}
+export class AppComponent { }
