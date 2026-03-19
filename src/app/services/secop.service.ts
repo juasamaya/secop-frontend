@@ -7,8 +7,7 @@ import { RespuestaApi } from '../models/alerta.model';
   providedIn: 'root'
 })
 export class SecopService {
-  // private apiUrl = 'https://secop-radar-api.onrender.com/api/alertas';
-  private apiUrl = 'http://localhost:8000/api/alertas';
+  private apiUrl = 'https://secop-radar-api.onrender.com/api/alertas';
 
   constructor(private http: HttpClient) { }
 
