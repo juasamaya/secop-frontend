@@ -8,8 +8,15 @@ export interface ContratoAlerta {
   motivo_alerta: string;
 }
 
-export interface RespuestaApi {
+export interface Metadata {
   total_alertas: number;
+  pagina_actual: number;
+  total_paginas: number;
+  limite_por_pagina: number;
+}
+
+export interface RespuestaApi {
+  metadata: Metadata;
   parametros_usados: any;
   datos: ContratoAlerta[];
 }
