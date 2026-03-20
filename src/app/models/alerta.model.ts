@@ -20,3 +20,16 @@ export interface RespuestaApi {
   parametros_usados: any;
   datos: ContratoAlerta[];
 }
+
+export interface FiltrosMotor {
+  departamento?: string | null;
+  ciudad?: string | null;
+  entidad?: string | null;
+  busqueda?: string | null;
+  umbral_corbatas?: number;
+  umbral_fraccionamiento?: number;
+  umbral_valor?: number;
+  pagina: number;
+  limite: number;
+  [key: string]: any; 
+}

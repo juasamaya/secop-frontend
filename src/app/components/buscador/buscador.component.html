@@ -10,44 +10,50 @@
   </div>
 
   <div class="row px-3">
-    
     <div class="col-lg-3 col-md-4 mb-4">
       <div class="card shadow-sm border-0 h-100">
-        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-          <h6 class="fw-bold text-uppercase text-secondary mb-0">Panel de Control</h6>
+        <div class="card-header bg-dark text-white pt-3 pb-2">
+          <h6 class="fw-bold mb-0"><i class="bi bi-terminal"></i> Consola de Mando</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body bg-white">
+          
+          <div class="alert alert-danger py-2 px-3 small fw-bold" *ngIf="errorValidacion">
+            <i class="bi bi-shield-x"></i> {{ errorValidacion }}
+          </div>
+
           <form [formGroup]="motorForm" (ngSubmit)="analizarDatos(1)">
             
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-dark mb-1"><i class="bi bi-key-fill text-warning"></i> Llave de Acceso (API Key)</label>
+              <input type="password" class="form-control" formControlName="apiKey" placeholder="Ingresa tu token...">
+            </div>
+
             <div class="p-3 bg-light rounded mb-3 border">
               <label class="form-label small fw-bold text-primary mb-1"><i class="bi bi-funnel"></i> Filtros de Datos</label>
-              <input type="text" class="form-control form-control-sm mb-2" formControlName="ciudad" placeholder="Ciudad (Ej. Bogotá)">
-              <input type="text" class="form-control form-control-sm mb-2" formControlName="entidad" placeholder="Entidad (Ej. SENA)">
-              <input type="text" class="form-control form-control-sm" formControlName="busqueda" placeholder="Palabra clave (Ej. Cámaras, Vías)">
+              <input type="text" class="form-control form-control-sm mb-2" formControlName="ciudad" placeholder="Ciudad (Ej. Cali)">
+              <input type="text" class="form-control form-control-sm mb-2" formControlName="entidad" placeholder="Entidad (Ej. Gobernación)">
+              <input type="text" class="form-control form-control-sm" formControlName="busqueda" placeholder="Palabra clave (Ej. Salud)">
             </div>
 
             <div class="p-3 bg-light rounded mb-4 border">
-              <label class="form-label small fw-bold text-danger mb-1"><i class="bi bi-sliders"></i> Calibración de Riesgo</label>
-              
+              <label class="form-label small fw-bold text-danger mb-1"><i class="bi bi-sliders"></i> Umbrales Heurísticos</label>
               <div class="mt-2">
-                <label class="form-label text-muted" style="font-size: 0.75rem;">Contratos para detectar "Corbata"</label>
+                <label class="form-label text-muted" style="font-size: 0.75rem;">Topes "Corbata"</label>
                 <input type="number" class="form-control form-control-sm" formControlName="umbral_corbatas">
               </div>
-              
               <div class="mt-2">
-                <label class="form-label text-muted" style="font-size: 0.75rem;">Contratos para "Fraccionamiento"</label>
+                <label class="form-label text-muted" style="font-size: 0.75rem;">Topes "Fraccionamiento"</label>
                 <input type="number" class="form-control form-control-sm" formControlName="umbral_fraccionamiento">
               </div>
-              
               <div class="mt-2">
-                <label class="form-label text-muted" style="font-size: 0.75rem;">Tope Contrato Directo (COP)</label>
+                <label class="form-label text-muted" style="font-size: 0.75rem;">Tope Dinero Directo</label>
                 <input type="number" class="form-control form-control-sm" formControlName="umbral_valor" step="10000000">
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm py-2" [disabled]="cargando">
-              <span *ngIf="!cargando"><i class="bi bi-play-fill"></i> Ejecutar Análisis</span>
-              <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+            <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm py-2" [disabled]="cargando">
+              <span *ngIf="!cargando"><i class="bi bi-play-fill text-success"></i> Ejecutar Motor</span>
+              <span *ngIf="cargando" class="spinner-border spinner-border-sm text-success"></span>
             </button>
           </form>
         </div>
@@ -60,8 +66,8 @@
         <div class="card-body d-flex justify-content-between align-items-center py-3">
           <div>
             <h5 class="mb-0 fw-bold">Anomalías Detectadas</h5>
-            <small class="text-muted" *ngIf="busquedaRealizada">Mostrando resultados de la última ejecución</small>
-            <small class="text-muted" *ngIf="!busquedaRealizada">Esperando ejecución del motor...</small>
+            <small class="text-muted" *ngIf="busquedaRealizada">Click en una fila para abrir el Dossier Investigativo</small>
+            <small class="text-muted" *ngIf="!busquedaRealizada">Ingresa tu token y ejecuta el motor...</small>
           </div>
           <span class="badge rounded-pill bg-danger fs-4 px-4 py-2 shadow-sm">{{ totalAlertas }}</span>
         </div>
@@ -77,44 +83,40 @@
                   <th>Entidad Pública</th>
                   <th>Contratista (Proveedor)</th>
                   <th class="text-end">Valor (COP)</th>
-                  <th class="pe-4">Hallazgos Algorítmicos</th>
+                  <th class="pe-4">Banderas</th>
                 </tr>
               </thead>
               <tbody>
-                
                 <tr *ngIf="cargando">
                   <td colspan="5" class="text-center py-5 text-muted bg-light">
                     <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-                    <h5 class="fw-bold">Ingestando y analizando datos...</h5>
-                    <p class="small">El algoritmo está evaluando miles de registros.</p>
+                    <h5 class="fw-bold">Verificando Credenciales y Analizando Datos...</h5>
                   </td>
                 </tr>
                 
-                <tr *ngIf="!cargando && busquedaRealizada && alertas.length === 0">
+                <tr *ngIf="!cargando && busquedaRealizada && alertas.length === 0 && !errorValidacion">
                   <td colspan="5" class="text-center py-5 text-muted bg-light">
-                    <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    <i class="bi bi-shield-check text-success" style="font-size: 3rem;"></i>
                     <h5 class="mt-3 fw-bold">No se detectaron banderas rojas</h5>
-                    <p class="small">Prueba bajando los umbrales o buscando otra entidad.</p>
                   </td>
                 </tr>
 
-                <tr *ngFor="let alerta of alertas">
+                <tr *ngFor="let alerta of alertas" 
+                    (click)="abrirDossier(alerta)" 
+                    style="cursor: pointer;" 
+                    class="table-row-hover">
                   <td class="ps-4 text-center">
-                    <span [class]="obtenerClaseRiesgo(alerta.riesgo_corrupcion)">
-                      {{ alerta.riesgo_corrupcion }} pts
-                    </span>
+                    <span [class]="obtenerClaseRiesgo(alerta.riesgo_corrupcion)">{{ alerta.riesgo_corrupcion }} pts</span>
                   </td>
                   <td class="small fw-bold text-dark" style="max-width: 250px;">{{ alerta.nombre_entidad }}</td>
                   <td class="small text-secondary" style="max-width: 200px;">
-                    <span [class.text-danger]="alerta.proveedor_adjudicado.includes('CONSORCIO') || alerta.proveedor_adjudicado.includes('UNION')">
+                    <span [class.text-danger]="alerta.proveedor_adjudicado.includes('CONSORCIO') || alerta.proveedor_adjudicado.includes('UNION') || alerta.proveedor_adjudicado.includes('XXXX')">
                       {{ alerta.proveedor_adjudicado | titlecase }}
                     </span>
                   </td>
                   <td class="text-end font-monospace fw-bold text-dark">{{ alerta.valor_del_contrato | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                   <td class="pe-4">
-                    <small class="text-danger fw-semibold d-block" style="line-height: 1.2;">
-                      {{ alerta.motivo_alerta }}
-                    </small>
+                    <small class="text-danger fw-semibold d-block" style="line-height: 1.2;">{{ alerta.motivo_alerta }}</small>
                   </td>
                 </tr>
 
@@ -123,26 +125,77 @@
           </div>
         </div>
         
-        <div class="card-footer bg-white border-top py-3" *ngIf="totalPaginas > 1 && !cargando">
+        <div class="card-footer bg-white border-top py-3" *ngIf="totalPaginas > 1 && !cargando && !errorValidacion">
           <div class="d-flex justify-content-between align-items-center px-2">
-            <span class="text-muted small">
-              Página <b class="text-dark">{{ paginaActual }}</b> de <b class="text-dark">{{ totalPaginas }}</b>
-            </span>
+            <span class="text-muted small">Página <b class="text-dark">{{ paginaActual }}</b> de <b class="text-dark">{{ totalPaginas }}</b></span>
             <div class="btn-group shadow-sm">
-              <button class="btn btn-outline-primary btn-sm fw-bold px-3" 
-                      (click)="cambiarPagina(-1)" 
-                      [disabled]="paginaActual === 1">
-                <i class="bi bi-chevron-left"></i> Anterior
-              </button>
-              <button class="btn btn-outline-primary btn-sm fw-bold px-3" 
-                      (click)="cambiarPagina(1)" 
-                      [disabled]="paginaActual === totalPaginas">
-                Siguiente <i class="bi bi-chevron-right"></i>
-              </button>
+              <button class="btn btn-outline-dark btn-sm fw-bold px-3" (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1"><i class="bi bi-chevron-left"></i> Anterior</button>
+              <button class="btn btn-outline-dark btn-sm fw-bold px-3" (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">Siguiente <i class="bi bi-chevron-right"></i></button>
             </div>
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.8);" *ngIf="alertaSeleccionada">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      
+      <div class="modal-header bg-dark text-white border-0">
+        <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-lock text-danger me-2"></i> Expediente de Riesgo: {{ alertaSeleccionada.id_contrato }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarDossier()"></button>
+      </div>
+      
+      <div class="modal-body p-4 bg-light">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <p class="text-muted small mb-1 text-uppercase fw-bold">Entidad Adjudicadora</p>
+                <h6 class="fw-bolder text-dark">{{ alertaSeleccionada.nombre_entidad }}</h6>
+              </div>
+              <div class="col-md-6">
+                <p class="text-muted small mb-1 text-uppercase fw-bold">Contratista Beneficiado</p>
+                <h6 class="fw-bolder text-danger">{{ alertaSeleccionada.proveedor_adjudicado }}</h6>
+              </div>
+            </div>
+            <hr class="text-muted opacity-25">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="text-muted small mb-1 text-uppercase fw-bold">Valor Comprometido</p>
+                <h4 class="fw-bolder font-monospace text-dark mb-0">{{ alertaSeleccionada.valor_del_contrato | currency:'COP':'symbol-narrow':'1.0-0' }}</h4>
+              </div>
+              <div class="col-md-6 d-flex align-items-center">
+                <div>
+                  <p class="text-muted small mb-1 text-uppercase fw-bold">Modalidad Usada</p>
+                  <span class="badge bg-secondary fs-6">{{ alertaSeleccionada.modalidad_de_contratacion }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="fw-bold text-dark mb-3 border-bottom pb-2"><i class="bi bi-shield-exclamation text-warning"></i> Análisis Detallado de Infracciones</h6>
+        
+        <div class="list-group list-group-flush shadow-sm rounded">
+          <div class="list-group-item list-group-item-action p-3 border-start border-danger border-4" *ngFor="let hallazgo of detallesDossier">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <h6 class="mb-1 fw-bold text-danger"><i class="bi {{ hallazgo.icon }} me-2"></i>{{ hallazgo.titulo }}</h6>
+            </div>
+            <p class="mb-0 small text-muted" style="line-height: 1.5; text-align: justify;">
+              {{ hallazgo.desc }}
+            </p>
+          </div>
+        </div>
+
+      </div>
+      
+      <div class="modal-footer bg-white border-0">
+        <a href="https://www.colombiacompra.gov.co/secop-ii" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-search"></i> Buscar PDF Original en SECOP</a>
+        <button type="button" class="btn btn-dark btn-sm px-4" (click)="cerrarDossier()">Cerrar Expediente</button>
       </div>
 
     </div>
