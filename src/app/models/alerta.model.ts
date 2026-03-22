@@ -6,6 +6,9 @@ export interface ContratoAlerta {
   valor_del_contrato: number;
   riesgo_corrupcion: number;
   motivo_alerta: string;
+  descripcion_contrato: string;
+  anio_contrato: number;
+  fecha_contrato_str: string;
 }
 
 export interface Metadata {
@@ -26,6 +29,7 @@ export interface FiltrosMotor {
   ciudad?: string | null;
   entidad?: string | null;
   busqueda?: string | null;
+  anio?: number | null;
   umbral_corbatas?: number;
   umbral_fraccionamiento?: number;
   umbral_valor?: number;
