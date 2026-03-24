@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SecopService } from '../../services/secop.service';
 import { ContratoAlerta, FiltrosMotor } from '../../models/alerta.model';
+import { VisorForenseComponent } from '../visor-forense/visor-forense.component';
 
 @Component({
   selector: 'app-buscador',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, VisorForenseComponent],
   templateUrl: './buscador.component.html',
   styleUrls: ['./buscador.component.css']
 })
@@ -24,10 +25,11 @@ export class BuscadorComponent implements OnInit {
   errorValidacion: string | null = null;
   alertaSeleccionada: ContratoAlerta | null = null;
   detallesDossier: any[] = []; 
+  
+  // Variable para el Visor Forense
+  contratoSeleccionado: string | null = null;
 
   listaAnios: number[] = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
-  listaCiudades: string[] = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Cúcuta', 'Ibagué', 'Santa Marta', 'Villavicencio', 'Pasto', 'Montería', 'Valledupar', 'Popayán', 'Sincelejo', 'Armenia', 'Neiva', 'Riohacha', 'Tunja'];
-  listaEntidades: string[] = ['Alcaldía', 'Gobernación', 'Hospital', 'Personería', 'Contraloría', 'Concejo', 'Universidad', 'Ministerio', 'SENA', 'ICBF', 'Policía', 'Ejército'];
 
   constructor(private fb: FormBuilder, private secopService: SecopService) {}
 
@@ -121,7 +123,6 @@ export class BuscadorComponent implements OnInit {
   generarGlosarioInvestigativo(motivos: string): any[] {
     const glosario = [];
     
-    // NUEVAS ALERTAS FORENSES
     if (motivos.includes('Múltiples Empresas')) {
       glosario.push({ titulo: 'Carrusel de Testaferros (Mismo Representante)', desc: 'La Inteligencia de Datos cruzó la cédula del representante legal y descubrió que esta misma persona firma contratos usando múltiples razones sociales (empresas diferentes) con esta entidad. Práctica típica para simular pluralidad de oferentes.', icon: 'bi-people-fill' });
     }
@@ -137,8 +138,6 @@ export class BuscadorComponent implements OnInit {
     if (motivos.includes('Fin de Semana')) {
       glosario.push({ titulo: 'Firma en Día No Laborable', desc: 'El sistema registró la firma de este documento un Sábado o Domingo, lo cual es inusual para la administración pública y suele indicar contrataciones "relámpago".', icon: 'bi-calendar-week' });
     }
-
-    // ALERTAS CLÁSICAS
     if (motivos.includes('Sin Fecha de Firma')) {
       glosario.push({ titulo: 'Anomalía Documental: Omisión de Firma', desc: 'El funcionario público omitió registrar en el sistema la fecha exacta en la que se firmó el documento. Falta de transparencia grave.', icon: 'bi-calendar-x' });
     }
@@ -167,5 +166,16 @@ export class BuscadorComponent implements OnInit {
       glosario.push({ titulo: 'Detección por Inteligencia Artificial (Isolation Forest)', desc: 'El algoritmo matemático determinó que este contrato pertenece al 5% de los datos más atípicos (Tasa de Contaminación) de su entidad.', icon: 'bi-robot' });
     }
     return glosario;
+  }
+
+  // FUNCIONES DEL VISOR FORENSE
+  analizarContrato(idContrato: string, event: Event): void {
+    event.stopPropagation(); // Evita que se abra el Dossier al mismo tiempo
+    console.log("Iniciando análisis forense para:", idContrato);
+    this.contratoSeleccionado = idContrato;
+  }
+
+  cerrarVisorForense(): void {
+    this.contratoSeleccionado = null;
   }
 }

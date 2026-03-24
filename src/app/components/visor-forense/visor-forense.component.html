@@ -1,0 +1,43 @@
+<div class="visor-wrapper">
+  <div class="toolbar d-flex justify-content-between align-items-center p-3 border-bottom border-secondary bg-dark">
+    <div>
+      <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" accept=".xlsx, .xls, .csv">
+      
+      <button class="btn btn-success btn-sm fw-bold shadow-sm" (click)="triggerFileInput()" [disabled]="subiendoArchivo">
+        <span *ngIf="!subiendoArchivo"><i class="bi bi-cloud-arrow-up-fill"></i> Inyectar Dossier PEP (.xlsx)</span>
+        <span *ngIf="subiendoArchivo" class="spinner-border spinner-border-sm"></span>
+      </button>
+
+      <a href="https://www.funcionpublica.gov.co/fdci/consultaCiudadana/consultaPEP" target="_blank" class="btn btn-outline-info btn-sm ms-2 fw-bold">
+        <i class="bi bi-box-arrow-up-right"></i> Descargar Datos PEP
+      </a>
+      
+      <small class="text-muted ms-3 d-none d-md-inline" *ngIf="!subiendoArchivo">Descarga la declaración y súbela para cruzar familiares.</small>
+    </div>
+  </div>
+
+  <div class="canvas-parent">
+    <div #networkContainer class="grafo-container"></div>
+    
+    <div class="panel-detalles shadow-lg" *ngIf="nodoSeleccionado">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h6 class="text-info fw-bold mb-0"><i class="bi bi-info-square me-2"></i>Ficha de Inteligencia</h6>
+        <button class="btn-close btn-close-white btn-sm" (click)="cerrarPanel()"></button>
+      </div>
+      
+      <span class="badge mb-3 w-100 py-2 fs-6" [ngClass]="'bg-' + nodoSeleccionado.group">
+        {{ nodoSeleccionado.group | uppercase }}
+      </span>
+      
+      <div class="propiedades-scroll text-light" [innerHTML]="nodoSeleccionado.title"></div>
+    </div>
+  </div>
+
+  <div class="leyenda">
+    <span class="badge bg-EntidadPublica">🏢 Entidad Pública</span>
+    <span class="badge bg-Contrato">📄 Contrato</span>
+    <span class="badge bg-Empresa">💼 Empresa</span>
+    <span class="badge bg-Persona">👤 Persona/Natural</span>
+    <span class="badge bg-PEP">🏛️ Político (PEP)</span>
+  </div>
+</div>

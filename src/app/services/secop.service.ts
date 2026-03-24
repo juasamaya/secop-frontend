@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FiltrosMotor, RespuestaApi } from '../models/alerta.model';
+import { apiUrl } from '../utils/apiUrl';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SecopService {
-  private apiUrl = 'https://secop-radar-api.onrender.com/api/alertas';
-  // private apiUrl = 'http://localhost:8000/api/alertas';
+  private url = apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -26,6 +26,6 @@ export class SecopService {
         'api-key': apiKey
       });
 
-      return this.http.get<RespuestaApi>(this.apiUrl, { params, headers });
+      return this.http.get<RespuestaApi>(this.url, { params, headers });
   }
 }

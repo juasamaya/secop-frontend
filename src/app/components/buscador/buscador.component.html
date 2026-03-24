@@ -82,21 +82,22 @@
                   <th>Contratista (Proveedor)</th>
                   <th class="text-end">Valor (COP)</th>
                   <th class="pe-4">Banderas</th>
-                </tr>
+                  <th>Red Forense</th> </tr>
               </thead>
               <tbody>
                 <tr *ngIf="cargando">
-                  <td colspan="5" class="text-center py-5 text-muted bg-light">
+                  <td colspan="6" class="text-center py-5 text-muted bg-light">
                     <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                     <h5 class="fw-bold">Verificando Credenciales y Analizando Datos...</h5>
                   </td>
                 </tr>
                 <tr *ngIf="!cargando && busquedaRealizada && alertas.length === 0 && !errorValidacion">
-                  <td colspan="5" class="text-center py-5 text-muted bg-light">
+                  <td colspan="6" class="text-center py-5 text-muted bg-light">
                     <i class="bi bi-shield-check text-success" style="font-size: 3rem;"></i>
                     <h5 class="mt-3 fw-bold">No se detectaron banderas rojas</h5>
                   </td>
                 </tr>
+                
                 <tr *ngFor="let alerta of alertas" (click)="abrirDossier(alerta)" style="cursor: pointer;" class="table-row-hover">
                   <td class="ps-4 text-center">
                     <span [class]="obtenerClaseRiesgo(alerta.riesgo_corrupcion)">{{ alerta.riesgo_corrupcion }} pts</span>
@@ -116,6 +117,13 @@
                   <td class="pe-4">
                     <small class="text-danger fw-semibold d-block" style="line-height: 1.2;">{{ alerta.motivo_alerta }}</small>
                   </td>
+                  
+                  <td>
+                    <button class="btn btn-outline-dark btn-sm fw-bold shadow-sm" (click)="analizarContrato(alerta.id_contrato, $event)">
+                      <i class="bi bi-spider"></i> Ver Red
+                    </button>
+                  </td>
+
                 </tr>
               </tbody>
             </table>
@@ -168,7 +176,6 @@
                   <span class="badge bg-secondary fs-6">{{ alertaSeleccionada.modalidad_de_contratacion }}</span>
                 </div>
               </div>
-              
               <div class="col-md-4 d-flex align-items-center">
                 <div>
                   <p class="text-muted small mb-1 text-uppercase fw-bold">Fecha del Contrato</p>
@@ -180,9 +187,7 @@
                   </span>
                 </div>
               </div>
-
             </div>
-            
             <div class="bg-light p-3 rounded border start-border-primary">
               <p class="text-primary small mb-1 text-uppercase fw-bold"><i class="bi bi-card-text"></i> Objeto del Contrato</p>
               <p class="mb-0 small text-dark" style="font-style: italic; line-height: 1.4;">
@@ -207,6 +212,20 @@
       <div class="modal-footer bg-white border-0">
         <a href="https://www.colombiacompra.gov.co/secop-ii" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-search"></i> Buscar PDF Original en SECOP</a>
         <button type="button" class="btn btn-dark btn-sm px-4" (click)="cerrarDossier()">Cerrar Expediente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.95);" *ngIf="contratoSeleccionado">
+  <div class="modal-dialog modal-fullscreen p-4">
+    <div class="modal-content bg-dark border-secondary shadow-lg rounded-3 h-100">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-white fw-bold"><i class="bi bi-spider text-success me-2"></i> Telaraña de Corrupción: {{ contratoSeleccionado }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarVisorForense()"></button>
+      </div>
+      <div class="modal-body p-0 d-flex flex-column" style="height: 100%;">
+        <app-visor-forense [contratoIdSeleccionado]="contratoSeleccionado" class="flex-grow-1 d-flex"></app-visor-forense>
       </div>
     </div>
   </div>

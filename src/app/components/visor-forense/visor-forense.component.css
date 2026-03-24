@@ -1,0 +1,81 @@
+.visor-wrapper {
+  background-color: #111827;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Ocupa el 100% de la ventana del modal */
+  overflow: hidden; /* Prohíbe cualquier scroll externo */
+}
+
+/* El truco anti-crecimiento infinito: min-height: 0 */
+.canvas-parent {
+  position: relative;
+  flex: 1; /* Toma todo el espacio sobrante entre la barra y la leyenda */
+  min-height: 0; /* Crucial para flexbox + vis-network */
+  width: 100%;
+}
+
+.grafo-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #030712;
+}
+
+.panel-detalles {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 350px;
+  max-height: calc(100% - 30px); /* Respeta los márgenes sin salirse de la pantalla */
+  background-color: rgba(17, 24, 39, 0.95);
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 20px;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+}
+
+.propiedades-scroll {
+  overflow-y: auto; /* Agrega scroll interno si hay muchos datos */
+  font-size: 0.9rem;
+  line-height: 1.6;
+  border-top: 1px solid #374151;
+  padding-top: 15px;
+}
+
+/* Estilizando la barra de scroll de la ficha para que se vea elegante */
+.propiedades-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.propiedades-scroll::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  border-radius: 4px;
+}
+
+.leyenda {
+  padding: 12px 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: #1f2937;
+  border-top: 1px solid #374151;
+  z-index: 10; /* Asegura que quede por encima de canvas si hay cruce */
+}
+
+.badge {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* Colores dinámicos */
+.bg-EntidadPublica { background-color: #3b82f6 !important; color: white; }
+.bg-Contrato { background-color: #10b981 !important; color: white; }
+.bg-Empresa { background-color: #f59e0b !important; color: white; }
+.bg-Persona { background-color: #ef4444 !important; color: white; }
+.bg-PEP { background-color: #8b5cf6 !important; color: white; }
