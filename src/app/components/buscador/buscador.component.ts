@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SecopService } from '../../services/secop.service';
+import { RadarService } from '../../services/radar.service';
 import { ContratoAlerta, FiltrosMotor } from '../../models/alerta.model';
 import { VisorForenseComponent } from '../visor-forense/visor-forense.component';
 
@@ -31,7 +31,7 @@ export class BuscadorComponent implements OnInit {
 
   listaAnios: number[] = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
 
-  constructor(private fb: FormBuilder, private secopService: SecopService) {}
+  constructor(private fb: FormBuilder, private radarService: RadarService) {}
 
   ngOnInit(): void {
     this.inicializarFormulario();
@@ -76,21 +76,33 @@ export class BuscadorComponent implements OnInit {
     this.cargando = true;
     this.busquedaRealizada = true;
     
+    // 1. Extraemos la llave de seguridad y los filtros del formulario
     const { apiKey, ...filtrosPuros } = this.motorForm.value;
+
+    // 2. Limpiamos cualquier filtro vacío para que FastAPI no arroje Error 422
+    Object.keys(filtrosPuros).forEach(key => {
+      if (filtrosPuros[key] === '' || filtrosPuros[key] === null) {
+        delete filtrosPuros[key];
+      }
+    });
+
     const filtros: FiltrosMotor = { ...filtrosPuros, pagina: pagina, limite: 10 };
 
-    this.secopService.ejecutarMotorRiesgo(filtros, apiKey).subscribe({
-      next: (respuesta) => {
+    // 3. Llamamos al servicio pasando los filtros y la llave extraída del input
+    this.radarService.obtenerAlertas(filtros, apiKey).subscribe({
+      next: (respuesta: any) => {
         this.alertas = respuesta.datos;
         this.totalAlertas = respuesta.metadata.total_alertas;
         this.paginaActual = respuesta.metadata.pagina_actual;
         this.totalPaginas = respuesta.metadata.total_paginas;
         this.cargando = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.cargando = false;
         if (err.status === 401) {
           this.errorValidacion = "Acceso Denegado. La clave ingresada es incorrecta.";
+        } else if (err.status === 422) {
+          this.errorValidacion = "Error en los datos de búsqueda. Revisa los filtros.";
         } else {
           this.errorValidacion = "Error de conexión con el servidor.";
         }
@@ -124,54 +136,52 @@ export class BuscadorComponent implements OnInit {
     const glosario = [];
     
     if (motivos.includes('Múltiples Empresas')) {
-      glosario.push({ titulo: 'Carrusel de Testaferros (Mismo Representante)', desc: 'La Inteligencia de Datos cruzó la cédula del representante legal y descubrió que esta misma persona firma contratos usando múltiples razones sociales (empresas diferentes) con esta entidad. Práctica típica para simular pluralidad de oferentes.', icon: 'bi-people-fill' });
+      glosario.push({ titulo: 'Carrusel de Testaferros', desc: 'Mismo representante legal con diferentes razones sociales.', icon: 'bi-people-fill' });
     }
     if (motivos.includes('Posible Sobrecosto')) {
-      glosario.push({ titulo: 'Alerta Financiera: Sobrecosto > 20%', desc: 'El valor final facturado o pagado de este contrato excedió en más de un 20% el valor inicialmente pactado. Sugiere posibles adiciones irregulares a puerta cerrada.', icon: 'bi-graph-up-arrow' });
+      glosario.push({ titulo: 'Sobrecosto > 20%', desc: 'Valor facturado excede el pactado inicial.', icon: 'bi-graph-up-arrow' });
     }
     if (motivos.includes('Empresa Todoterreno')) {
-      glosario.push({ titulo: 'Fachada Multiproposito (Empresa Todoterreno)', desc: 'Esta empresa tiene contratos adjudicados en 3 o más sectores económicos completamente distintos (ej. papelería, construcción, alimentación). Comportamiento característico de empresas "de papel" creadas para ganar contratos, no por su idoneidad.', icon: 'bi-tools' });
+      glosario.push({ titulo: 'Fachada Multiproposito', desc: 'Contratos en sectores económicos no relacionados.', icon: 'bi-tools' });
     }
     if (motivos.includes('Raspado de Olla')) {
-      glosario.push({ titulo: 'Contrato "Raspado de Olla" (Fin de Año)', desc: 'Este contrato se firmó en la última semana del año (del 24 al 31 de diciembre). Históricamente, estas fechas se usan para adjudicar rápido y agotar el presupuesto antes del cierre fiscal, reduciendo la veeduría ciudadana.', icon: 'bi-calendar2-x' });
+      glosario.push({ titulo: 'Raspado de Olla', desc: 'Firma a fin de año para agotar presupuesto.', icon: 'bi-calendar2-x' });
     }
     if (motivos.includes('Fin de Semana')) {
-      glosario.push({ titulo: 'Firma en Día No Laborable', desc: 'El sistema registró la firma de este documento un Sábado o Domingo, lo cual es inusual para la administración pública y suele indicar contrataciones "relámpago".', icon: 'bi-calendar-week' });
+      glosario.push({ titulo: 'Día No Laborable', desc: 'Firma en sábado o domingo.', icon: 'bi-calendar-week' });
     }
     if (motivos.includes('Sin Fecha de Firma')) {
-      glosario.push({ titulo: 'Anomalía Documental: Omisión de Firma', desc: 'El funcionario público omitió registrar en el sistema la fecha exacta en la que se firmó el documento. Falta de transparencia grave.', icon: 'bi-calendar-x' });
+      glosario.push({ titulo: 'Omisión de Firma', desc: 'Falta fecha de firma en el sistema.', icon: 'bi-calendar-x' });
     }
     if (motivos.includes('Corbata')) {
-      glosario.push({ titulo: 'Carrusel de Contratos (Corbatas)', desc: 'Una misma persona o empresa registra múltiples contratos simultáneos en esta muestra.', icon: 'bi-person-badge' });
+      glosario.push({ titulo: 'Corbatas', desc: 'Múltiples contratos simultáneos.', icon: 'bi-person-badge' });
     }
     if (motivos.includes('Fraccionamiento')) {
-      glosario.push({ titulo: 'Alerta de Fraccionamiento', desc: 'Se detectó que la entidad dividió artificialmente un contrato grande en varios pequeños entregados a la misma empresa.', icon: 'bi-scissors' });
+      glosario.push({ titulo: 'Fraccionamiento', desc: 'Contratos divididos artificialmente.', icon: 'bi-scissors' });
     }
     if (motivos.includes('Contrato Directo >')) {
-      glosario.push({ titulo: 'Adjudicación Directa Inusual', desc: 'Se adjudicó un monto multimillonario sin competencia abierta. Riesgo alto de direccionamiento.', icon: 'bi-currency-dollar' });
+      glosario.push({ titulo: 'Adjudicación Directa', desc: 'Monto alto sin competencia.', icon: 'bi-currency-dollar' });
     }
     if (motivos.includes('Retrasos')) {
-      glosario.push({ titulo: 'Tácticas de Retraso Crítico', desc: 'El contrato acumula adiciones de tiempo superiores a 180 días. Riesgo de elefante blanco.', icon: 'bi-clock-history' });
+      glosario.push({ titulo: 'Retraso Crítico', desc: 'Adiciones de tiempo altas.', icon: 'bi-clock-history' });
     }
     if (motivos.includes('Consorcio Multimillonario')) {
-      glosario.push({ titulo: 'Uso de Figura Asociativa (Consorcio)', desc: 'Contrato ganado por Unión Temporal o Consorcio. Frecuentemente usado para licuar responsabilidades.', icon: 'bi-building-exclamation' });
+      glosario.push({ titulo: 'Uso de Consorcio', desc: 'Figura asociativa inusual para el monto.', icon: 'bi-building-exclamation' });
     }
     if (motivos.includes('Anónimo')) {
-      glosario.push({ titulo: 'Opacidad de Identidad', desc: 'El nombre del adjudicatario ha sido ofuscado. Ocultar quién recibe los fondos públicos es una bandera roja crítica.', icon: 'bi-incognito' });
+      glosario.push({ titulo: 'Opacidad', desc: 'Identidad del adjudicatario oculta.', icon: 'bi-incognito' });
     }
     if (motivos.includes('otros años')) {
-      glosario.push({ titulo: 'Contexto de Reincidencia Histórica', desc: 'El sistema detectó que este contratista también ha recibido adjudicaciones en años diferentes al que estás consultando actualmente.', icon: 'bi-hourglass-split' });
+      glosario.push({ titulo: 'Reincidencia', desc: 'Adjudicaciones previas detectadas.', icon: 'bi-hourglass-split' });
     }
     if (motivos.includes('IA: Anomalía')) {
-      glosario.push({ titulo: 'Detección por Inteligencia Artificial (Isolation Forest)', desc: 'El algoritmo matemático determinó que este contrato pertenece al 5% de los datos más atípicos (Tasa de Contaminación) de su entidad.', icon: 'bi-robot' });
+      glosario.push({ titulo: 'Anomalía IA', desc: 'Isolation Forest detectó atipicidad.', icon: 'bi-robot' });
     }
     return glosario;
   }
 
-  // FUNCIONES DEL VISOR FORENSE
   analizarContrato(idContrato: string, event: Event): void {
-    event.stopPropagation(); // Evita que se abra el Dossier al mismo tiempo
-    console.log("Iniciando análisis forense para:", idContrato);
+    event.stopPropagation(); 
     this.contratoSeleccionado = idContrato;
   }
 
