@@ -18,11 +18,24 @@
           <div class="alert alert-danger py-2 px-3 small fw-bold" *ngIf="errorValidacion">
             <i class="bi bi-shield-x"></i> {{ errorValidacion }}
           </div>
+          
           <form [formGroup]="motorForm" (ngSubmit)="analizarDatos(1)">
+            
             <div class="mb-4">
-              <label class="form-label small fw-bold text-dark mb-1"><i class="bi bi-key-fill text-warning"></i> Llave de Acceso (API Key)</label>
-              <input type="password" class="form-control" formControlName="apiKey" placeholder="Ingresa tu token...">
+              <label class="form-label small fw-bold text-dark mb-1">
+                <i class="bi bi-key-fill text-warning"></i> Llave de Acceso (API Key)
+              </label>
+              <input type="password" class="form-control mb-2" formControlName="apiKey" placeholder="Ingresa tu token...">
+              
+              <div class="d-grid mt-2">
+                <a href="https://wa.me/573227191362?text=Hola%20Juan%2C%20estoy%20interesado%20en%20solicitar%20una%20Llave%20de%20Acceso%20para%20usar%20Radar%20SECOP." 
+                   target="_blank" 
+                   class="btn btn-sm btn-outline-success border-2 fw-bold shadow-sm d-flex justify-content-center align-items-center">
+                  <i class="bi bi-whatsapp me-2 fs-5"></i> Solicitar Acceso al Radar
+                </a>
+              </div>
             </div>
+
             <div class="p-3 bg-light rounded mb-3 border">
               <label class="form-label small fw-bold text-primary mb-1"><i class="bi bi-funnel"></i> Filtros de Datos</label>
               <input type="text" class="form-control form-control-sm mb-2" formControlName="ciudad" placeholder="Ciudad (Ej. Cali)">
@@ -30,6 +43,7 @@
               <input type="text" class="form-control form-control-sm mb-2" formControlName="busqueda" placeholder="Palabra clave (Ej. Salud)">
               <input type="number" class="form-control form-control-sm" formControlName="anio" placeholder="Año (Ej. 2023)">
             </div>
+            
             <div class="p-3 bg-light rounded mb-4 border">
               <label class="form-label small fw-bold text-danger mb-1"><i class="bi bi-sliders"></i> Umbrales Heurísticos</label>
               <div class="mt-2">
@@ -45,6 +59,7 @@
                 <input type="number" class="form-control form-control-sm" formControlName="umbral_valor" step="10000000">
               </div>
             </div>
+            
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-dark fw-bold shadow-sm py-2" [disabled]="cargando">
                 <span *ngIf="!cargando"><i class="bi bi-play-fill text-success"></i> Ejecutar Motor</span>
@@ -82,7 +97,8 @@
                   <th>Contratista (Proveedor)</th>
                   <th class="text-end">Valor (COP)</th>
                   <th class="pe-4">Banderas</th>
-                  <th>Red Forense</th> </tr>
+                  <th>Red Forense</th> 
+                </tr>
               </thead>
               <tbody>
                 <tr *ngIf="cargando">
@@ -123,7 +139,6 @@
                       <i class="bi bi-spider"></i> Ver Red
                     </button>
                   </td>
-
                 </tr>
               </tbody>
             </table>

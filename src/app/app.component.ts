@@ -4,7 +4,7 @@ import { BuscadorComponent } from './components/buscador/buscador.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [BuscadorComponent], // <-- Importamos tu componente aquí
-  template: `<app-buscador></app-buscador>` // <-- Renderizamos directamente el buscador
+  imports: [BuscadorComponent],
+  template: `<app-buscador></app-buscador>`
 })
 export class AppComponent { }
